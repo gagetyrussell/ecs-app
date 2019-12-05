@@ -3,6 +3,8 @@ import dash
 import dash_html_components as html
 import dash_core_components as dcc
 import pandas as pd
+import flask
+
 
 response = requests.get('http://api.eia.gov/category/?api_key=27d5df4fc1b5d3fd846986305ff2bd1e&category_id=241335')
 rsp = response.json()
@@ -11,8 +13,9 @@ option_labels = [cat['name'] for cat in option_json]
 option_values = [cat['series_id'] for cat in option_json]
 dropdown_options = [{'label': label, 'value': value} for label, value in zip(option_labels, option_values)]
 
+server = flask.Flask(__name__)
 
-app = dash.Dash()
+app = dash.Dash(__name__,server=server)
 application = app.server
 
 app.layout = html.Div([
@@ -50,5 +53,4 @@ def update_output(value):
 
 
 if __name__ == '__main__':
-    # Beanstalk expects it to be running on 8080.
-    application.run(debug=True, port=8080)
+    app.run_server(debug=True)
